@@ -15,12 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-# from django
+from django.conf.urls import include
 
-# l = LogEntry(user_id=request.user.id, actions_flag=CHANGE, change_message="...")
-# l.save()
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    # path('system/', admin.site.urls),
+    path('system/', include("system.urls")),
 ]
