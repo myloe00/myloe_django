@@ -9,6 +9,7 @@ class LoginView(View): #需要继承自View类
     func = ''
 
     def dispatch(self, request, *args, **kwargs):
+        # todo CBV指定方法名称并指定请求类型（GET,POST）
         if hasattr(self, self.func):
             handler = getattr(self, self.func)
         else:
@@ -22,3 +23,6 @@ class LoginView(View): #需要继承自View类
     def login(self, request):
         # https: // blog.csdn.net / qq_31339141 / article / details / 103888903
         return HttpResponse("登录成功2")
+
+
+
