@@ -2,6 +2,9 @@ from django.db import models
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
+from util.common_util import ImmutableDict
+from copy import deepcopy
+from rest_framework.filters import OrderingFilter
 from system.models import SysUser
 class REF_obj:
     """
@@ -23,33 +26,53 @@ class REF_obj:
         self.views = type(f"{models.__name__}Serializers", (ModelViewSet, ), {**self.views_conf})
 
 
-DEFAULT_SERIALIZERS_CONF = {
-    "fields": '__all__'
-}
 
-DEFAULT_VIEWS_CONF = {
-    "filter_backends": (DjangoFilterBackend,),
-    "filterset_fields": ['id']
-}
-
-def create_views(model, serializers_conf=None, views_conf=None):
-    serializers_conf = serializers_conf or DEFAULT_SERIALIZERS_CONF
-    serializers_conf['model'] = model
-    views_conf = views_conf or DEFAULT_VIEWS_CONF
-    serializers = type(f"{model.__name__}Serializers", (ModelSerializer,), {
-        "Meta": type("Meta", (), {
-            **serializers_conf
-        })
+class ViewsGenerator:
+    DEFAULT_SERIALIZERS_CONF = ImmutableDict({
+        "fields": '__all__'
     })
 
-    views_conf['serializer_class'] = serializers
-    views_conf['queryset'] = views_conf.get('queryset') or model.objects.all()
-    views = type(f"{models.__name__}Serializers", (ModelViewSet,), {**views_conf})
+    DEFAULT_VIEWS_CONF = ImmutableDict({
+        "filter_backends": (DjangoFilterBackend, OrderingFilter, ),
+        "filterset_fields": ['id']
+    })
 
-    # todo 查询小于怎么处理
-    # todo 排序字段怎么处理
-    # filterset_fields默认取所有
-    return views
+    def __init__(self, model):
+        self.model = model
+        self._serializers = type(f"{self.model.__name__}Serializers", (ModelSerializer,), {
+            "Meta": type("Meta", (), {
+                "model": self.model,
+                "fields": '__all__'
+            })
+        })
+        self._views = type(f"{models.__name__}Serializers", (ModelViewSet,), {
+            "serializer_class": self._serializers,
+            "filter_backends": (DjangoFilterBackend, OrderingFilter, ),
+            "filterset_fields": ['id'],
+            "ordering_fields": ['id'],
+            "queryset": self.model.objects.all()
+        })
+        # self.create_views()
+
+    def set_serializers(self, serializers_conf: dict):
+        self._serializers.__dict__.update(**serializers_conf)
+
+    def set_views(self, views_conf: dict):
+        self._views.__dict__.update(**views_conf)
+
+    def create_views(self):
+        ...
+        # todo 自定义查询规则
+
+        # todo 排序字段怎么处理
+
+        # todo 分页组件
+        # pagination_class
+        # todo filterset_fields默认取所有
+
+    @property
+    def views(self):
+        return self._views
 
 
 class CURDManager:
@@ -58,16 +81,13 @@ class CURDManager:
     def __init__(self):
         self._registry = dict()
 
-    def register(self, model, prefix=None, views = None):
+    def register(self, model, prefix=None, views=None):
         prefix = prefix or model.__name__.lower()
-        views = views or create_views(model)
+        views = views or ViewsGenerator(model).views
         self._registry[model] = {
             "prefix": prefix, "views": views
         }
         return self
-
-    # def register_batch(self, model_list: List[REF_obj]):
-    #     [self.register(model) for model in model_list]
 
     @property
     def registry(self):
