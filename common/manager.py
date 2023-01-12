@@ -3,28 +3,8 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from util.common_util import ImmutableDict
-from copy import deepcopy
 from rest_framework.filters import OrderingFilter
-from system.models import SysUser
-class REF_obj:
-    """
-        封装REF参数对象
-    """
-
-    def __init__(self, model, serializers_conf=None, views_conf=None):
-        self.serializers_conf = serializers_conf or self.DEFAULT_SERIALIZERS_CONF
-        self.serializers_conf['model'] = model
-        self.views_conf = views_conf or dict()
-        self.serializers = type(f"{model.__name__}Serializers", (ModelSerializer, ), {
-            "Meta": type("Meta", (), {
-                **self.serializers_conf
-            })
-        })
-
-        self.views_conf['serializer_class'] = self.serializers
-        self.views_conf['queryset'] = self.views_conf.get('queryset') or model.objects.all()
-        self.views = type(f"{models.__name__}Serializers", (ModelViewSet, ), {**self.views_conf})
-
+from .model_config import MyloePagination, model_config, model_batch_config
 
 
 class ViewsGenerator:
@@ -45,30 +25,24 @@ class ViewsGenerator:
                 "fields": '__all__'
             })
         })
-        self._views = type(f"{models.__name__}Serializers", (ModelViewSet,), {
+        self._views = type(f"{self.model.__name__}Serializers", (ModelViewSet,), {
             "serializer_class": self._serializers,
             "filter_backends": (DjangoFilterBackend, OrderingFilter, ),
-            "filterset_fields": ['id'],
+            "filterset_fields": "__all__",
             "ordering_fields": ['id'],
             "queryset": self.model.objects.all()
         })
         # self.create_views()
 
-    def set_serializers(self, serializers_conf: dict):
-        self._serializers.__dict__.update(**serializers_conf)
+    def config_views(self, views_conf: dict):
+        for k, v in views_conf.items():
+            setattr(self._views, k, v)
 
-    def set_views(self, views_conf: dict):
-        self._views.__dict__.update(**views_conf)
+    def set_serializer(self, serializer):
+        setattr(self._views, "serializer_class", serializer)
 
-    def create_views(self):
-        ...
-        # todo 自定义查询规则
-
-        # todo 排序字段怎么处理
-
-        # todo 分页组件
-        # pagination_class
-        # todo filterset_fields默认取所有
+    def set_ordering_fields(self, *args):
+        setattr(self._views, args)
 
     @property
     def views(self):
@@ -89,11 +63,32 @@ class CURDManager:
         }
         return self
 
+    def register_4_page(self, model, prefix=None, views=None):
+        prefix = prefix or model.__name__.lower()
+        views = views or ViewsGenerator(model).views
+        if not getattr(views, "pagination_class"):
+            setattr(views, "pagination_class", MyloePagination)
+        self._registry[model] = {
+            "prefix": prefix, "views": views
+        }
+        return self
+
     @property
     def registry(self):
         return self._registry
 
 
 curd_manager = CURDManager()
-curd_manager.register(SysUser)
-print("111")
+
+for models, config_data in model_config.items():
+    prefix = config_data.pop("prefix", None)
+    gener = ViewsGenerator(models)
+    gener.config_views(config_data)
+    curd_manager.register(models, prefix, gener.views)
+
+curd_manager_page = CURDManager()
+for models, config_data in model_batch_config.items():
+    prefix = config_data.pop("prefix", None)
+    gener = ViewsGenerator(models)
+    gener.config_views(config_data)
+    curd_manager_page.register_4_page(models, prefix, gener.views)

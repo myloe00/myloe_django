@@ -7,5 +7,6 @@ from django.urls import path
 from .views import LoginView
 
 urlpatterns = [
+    # todo 功能权限与数据权限该如何隔离？
     path("test", LoginView.as_view(func='login'))
 ]

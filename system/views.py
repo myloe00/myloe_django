@@ -1,6 +1,10 @@
+import logging
+import time
+
 from django.shortcuts import render
 from django.http import HttpResponse
 # Create your views here.
+logger = logging.getLogger("django")
 
 from django.views import View
 

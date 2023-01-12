@@ -20,6 +20,7 @@ class SysContentType(models.Model):
         managed = False
         db_table = 'sys_content_type'
         unique_together = (('app_label', 'module'),)
+        ordering = ['id']
 
 
 class SysMenu(models.Model):
@@ -35,6 +36,7 @@ class SysMenu(models.Model):
     class Meta:
         managed = False
         db_table = 'sys_menu'
+        ordering = ['id']
 
 
 class SysPermission(models.Model):
@@ -47,6 +49,7 @@ class SysPermission(models.Model):
     class Meta:
         managed = False
         db_table = 'sys_permission'
+        ordering = ['id']
 
 
 class SysRole(models.Model):
@@ -57,6 +60,7 @@ class SysRole(models.Model):
     class Meta:
         managed = False
         db_table = 'sys_role'
+        ordering = ['id']
 
 
 class SysRoleMenu(models.Model):
@@ -67,6 +71,7 @@ class SysRoleMenu(models.Model):
     class Meta:
         managed = False
         db_table = 'sys_role_menu'
+        ordering = ['id']
 
 
 class SysRolePermissions(models.Model):
@@ -77,6 +82,7 @@ class SysRolePermissions(models.Model):
     class Meta:
         managed = False
         db_table = 'sys_role_permissions'
+        ordering = ['id']
 
 
 class SysUser(models.Model):
@@ -94,6 +100,7 @@ class SysUser(models.Model):
     class Meta:
         managed = False
         db_table = 'sys_user'
+        ordering = ['id']
 
 
 class SysUserRoles(models.Model):
@@ -104,3 +111,4 @@ class SysUserRoles(models.Model):
     class Meta:
         managed = False
         db_table = 'sys_user_roles'
+        ordering = ['id']
