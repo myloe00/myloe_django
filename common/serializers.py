@@ -11,6 +11,3 @@ class SysUserSerializers(serializers.ModelSerializer):
         model = SysUser
         # fields = ['username', 'first_name', 'last_name']
         fields = '__all__'
-
-# x =  SysUserSerializers()
-# print(x)

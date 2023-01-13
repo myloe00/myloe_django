@@ -86,6 +86,7 @@ class SysRolePermissions(models.Model):
 
 
 class SysUser(models.Model):
+    id = models.CharField(max_length=128, primary_key=True)
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     is_superuser = models.IntegerField()

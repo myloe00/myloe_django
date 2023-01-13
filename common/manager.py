@@ -22,7 +22,7 @@ class ViewsGenerator:
         self._serializers = type(f"{self.model.__name__}Serializers", (ModelSerializer,), {
             "Meta": type("Meta", (), {
                 "model": self.model,
-                "fields": '__all__'
+                "fields":"__all__"
             })
         })
         self._views = type(f"{self.model.__name__}Serializers", (ModelViewSet,), {

@@ -11,7 +11,6 @@ class LoginMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        request.user.username = request.GET.get('name')
         response = self.get_response(request)
         return response
 
