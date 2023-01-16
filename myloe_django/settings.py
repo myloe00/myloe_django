@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'system',
+    'common',
     # 'django.contrib.staticfiles',
 ]
 

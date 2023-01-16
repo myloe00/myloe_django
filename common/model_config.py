@@ -32,7 +32,7 @@ model_config = {
     SysUser: {} # value为空表示，注册该模型所有配置使用默认配置
 }
 
-model_batch_config = {
+model_page_config = {
     # reference_model:{
     #     # "serializer_class": serializers, 指定序列化对象
     #     # "filter_backends": (DjangoFilterBackend, OrderingFilter,),

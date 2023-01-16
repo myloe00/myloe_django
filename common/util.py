@@ -12,7 +12,11 @@ from django.http import Http404
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.mixins import DestroyModelMixin
-from rest_framework.views import View
+from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
+from django.apps import apps
+app_config = apps.get_app_config("common")
+# from .urls import batch_route
 
 def exception_handler(exc, context):
     """
@@ -55,33 +59,38 @@ def dispatch(self, request, *args, **kwargs):
     `.dispatch()` is pretty much the same as Django's regular dispatch,
     but with extra hooks for startup, finalize, and exception handling.
     """
-    self.response = View.dispatch(request, *args, **kwargs)
-    # self.args = args
-    # self.kwargs = kwargs
-    # request = self.initialize_request(request, *args, **kwargs)
-    # self.request = request
-    # self.headers = self.default_response_headers  # deprecate?
-    #
-    # try:
-    #     self.initial(request, *args, **kwargs)
-    #
-    #     # Get the appropriate handler method
-    #     if request.method.lower() in self.http_method_names:
-    #         handler = getattr(self, request.method.lower(),
-    #                           self.http_method_not_allowed)
-    #     else:
-    #         handler = self.http_method_not_allowed
-    #
-    #     response = handler(request, *args, **kwargs)
-    #
-    # except Exception as exc:
-    #     response = self.handle_exception(exc)
-    #
-    # self.response = self.finalize_response(request, response, *args, **kwargs)
+
+    self.args = args
+    self.kwargs = kwargs
+    request = self.initialize_request(request, *args, **kwargs)
+    self.request = request
+    self.headers = self.default_response_headers  # deprecate?
+
+    try:
+        self.initial(request, *args, **kwargs)
+
+        # Get the appropriate handler method
+        if app_config.batch_route in request.path and request.method.lower() == "delete":
+            handler = getattr(self, "multi_delete")
+        elif app_config.batch_route in request.path and request.method.lower() == "post" :
+            handler = getattr(self, "multi_post")
+        elif app_config.batch_route in request.path and request.method.lower() == "patch":
+            handler = getattr(self, "multi_patch")
+        elif app_config.batch_route in request.path and request.method.lower() == "put":
+            handler = getattr(self, "multi_put")
+        elif request.method.lower() in self.http_method_names:
+            handler = getattr(self, request.method.lower(), self.http_method_not_allowed)
+        else:
+            handler = self.http_method_not_allowed
+        response = handler(request, *args, **kwargs)
+    except Exception as exc:
+        response = self.handle_exception(exc)
+
+    self.response = self.finalize_response(request, response, *args, **kwargs)
     return self.response
 
 
 def monkey_rest_framework():
     rest_framework.views.exception_handler = exception_handler
     DestroyModelMixin.destroy = destroy
-    View.dispatch = dispatch
+    APIView.dispatch = dispatch

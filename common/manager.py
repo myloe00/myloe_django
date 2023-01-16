@@ -1,11 +1,66 @@
+import logging
+
 from django.db import models
+from rest_framework.decorators import pretty_name,MethodMapper
+from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
+from rest_framework import status
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from util.common_util import ImmutableDict
 from rest_framework.filters import OrderingFilter
-from .model_config import MyloePagination, model_config, model_batch_config
+from .model_config import MyloePagination, model_config, model_page_config
+from functools import partial, partialmethod
+logger = logging.getLogger("django")
 
+
+def multi_delete(self, request, model, *args, **kwargs):
+    ids = request.query_params.get('ids', None)
+    if not ids:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    ids = ids.split(",")
+    model.objects.filter(id__in=ids).delete()
+    return Response(data={"msg": "delete success"})
+
+
+def multi_put(self, request, model, *args, **kwargs):
+    """批量新增"""
+    # print("args: ", args, " kwargs: ", kwargs)
+    partial = kwargs.pop('partial', None)
+    # print("partial: ", partial)
+    # 报错更新后的结果给前端
+    instances = []
+    if isinstance(request.data, list):
+        for item in request.data:
+            instance = get_object_or_404(model, id=int(item['id']))
+            # partial 允许局部更新
+            serializer = self.get_serializer(instance, data=item, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+        return Response(data={"msg": "modify success"})
+    else:
+        raise Exception
+
+
+def multi_patch(self, request, model, *args, **kwargs):
+    kwargs['partial'] = True
+    return self.multi_put(request, *args, **kwargs)
+
+
+def multi_post(self, request, *args, **kwargs):
+    headers = None
+    if isinstance(request.data, list):
+        res = list()
+        for item in request.data:
+            serializer = self.get_serializer(data=item)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            res.append(serializer.data)
+    else:
+        raise Exception
+    return Response(res, status=status.HTTP_201_CREATED, headers=headers)
 
 class ViewsGenerator:
     DEFAULT_SERIALIZERS_CONF = ImmutableDict({
@@ -25,12 +80,16 @@ class ViewsGenerator:
                 "fields":"__all__"
             })
         })
-        self._views = type(f"{self.model.__name__}Serializers", (ModelViewSet,), {
+        self._views = type(f"{self.model.__name__}Serializers", (ModelViewSet, ), {
             "serializer_class": self._serializers,
             "filter_backends": (DjangoFilterBackend, OrderingFilter, ),
             "filterset_fields": "__all__",
             "ordering_fields": ['id'],
-            "queryset": self.model.objects.all()
+            "queryset": self.model.objects.all(),
+            "multi_delete": partialmethod(multi_delete, model=self.model),
+            "multi_post": partialmethod(multi_post, model=self.model),
+            "multi_put": partialmethod(multi_put, model=self.model),
+            "multi_patch": partialmethod(multi_patch, model=self.model),
         })
         # self.create_views()
 
@@ -87,7 +146,7 @@ for models, config_data in model_config.items():
     curd_manager.register(models, prefix, gener.views)
 
 curd_manager_page = CURDManager()
-for models, config_data in model_batch_config.items():
+for models, config_data in model_page_config.items():
     prefix = config_data.pop("prefix", None)
     gener = ViewsGenerator(models)
     gener.config_views(config_data)
