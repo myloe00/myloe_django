@@ -15,7 +15,7 @@ class MyloePagination(PageNumberPagination):
         return Response({
             'count': self.page.paginator.count,
             'page': self.page.number,
-            # 'page_size': self.get_page_size(self.request),
+            'page_size': self.get_page_size(self.request),
             'results': data
         })
 

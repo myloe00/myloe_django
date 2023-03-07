@@ -7,7 +7,7 @@ from django.apps import apps
 monkey_rest_framework()
 
 
-# todo 分页路由与基础路由合并
+
 router = DefaultRouter()
 for model, conf in curd_manager.registry.items():
     router.register(conf['prefix'], conf['views'])
@@ -19,10 +19,8 @@ for model, conf in curd_manager_page.registry.items():
 app_config = apps.get_app_config("common")
 
 urlpatterns = [
-    # todo 批量修改测试验证
     # todo 关联查询
     path(app_config.batch_route, include(router.urls)),
     path(app_config.page_route, include(router_page.urls)),
     path(app_config.base_route, include(router.urls)),
-
 ]

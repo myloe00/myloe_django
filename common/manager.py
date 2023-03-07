@@ -16,18 +16,24 @@ logger = logging.getLogger("django")
 
 
 def multi_delete(self, request, model, *args, **kwargs):
-    ids = request.query_params.get('ids', None)
-    if not ids:
+    """
+        批量删除仅支持 in 操作。
+        /common/easy_curd/batch/sysuser/?id=1,2,3,4,5
+        表示删除id为1，2，3，4，5的5个用户
+    """
+    filter_params = dict()
+    for key in request.GET.keys():
+        filter_params[key+"__in"] = request.GET.get(key).split(",")
+    if not filter_params:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    ids = ids.split(",")
-    model.objects.filter(id__in=ids).delete()
+    model.objects.filter(**filter_params).delete()
     return Response(data={"msg": "delete success"})
 
 
 def multi_put(self, request, model, *args, **kwargs):
     """批量新增"""
     # print("args: ", args, " kwargs: ", kwargs)
-    partial = kwargs.pop('partial', None)
+    partial = kwargs.pop('partial', True)
     # print("partial: ", partial)
     # 报错更新后的结果给前端
     instances = []
