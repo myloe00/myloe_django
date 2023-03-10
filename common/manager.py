@@ -1,7 +1,5 @@
 import logging
 
-from django.db import models
-from rest_framework.decorators import pretty_name,MethodMapper
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
@@ -10,8 +8,10 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from util.common_util import ImmutableDict
 from rest_framework.filters import OrderingFilter
-from .model_config import MyloePagination, model_config, model_page_config
-from functools import partial, partialmethod
+from .model_config import MyloePagination
+from functools import partialmethod
+from rest_framework.routers import DefaultRouter
+
 logger = logging.getLogger("django")
 
 
@@ -20,6 +20,7 @@ def multi_delete(self, request, model, *args, **kwargs):
         批量删除仅支持 in 操作。
         /common/easy_curd/batch/sysuser/?id=1,2,3,4,5
         表示删除id为1，2，3，4，5的5个用户
+        # todo 优化返回的描述
     """
     filter_params = dict()
     for key in request.GET.keys():
@@ -31,11 +32,11 @@ def multi_delete(self, request, model, *args, **kwargs):
 
 
 def multi_put(self, request, model, *args, **kwargs):
-    """批量新增"""
-    # print("args: ", args, " kwargs: ", kwargs)
+    """
+    批量新增
+    # todo 返回新增异常的对象
+    """
     partial = kwargs.pop('partial', True)
-    # print("partial: ", partial)
-    # 报错更新后的结果给前端
     instances = []
     if isinstance(request.data, list):
         for item in request.data:
@@ -67,6 +68,7 @@ def multi_post(self, request, *args, **kwargs):
     else:
         raise Exception
     return Response(res, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class ViewsGenerator:
     DEFAULT_SERIALIZERS_CONF = ImmutableDict({
@@ -120,18 +122,10 @@ class CURDManager:
     def __init__(self):
         self._registry = dict()
 
-    def register(self, model, prefix=None, views=None):
+    def register(self, model, prefix=None, views=None, with_page=True):
         prefix = prefix or model.__name__.lower()
         views = views or ViewsGenerator(model).views
-        self._registry[model] = {
-            "prefix": prefix, "views": views
-        }
-        return self
-
-    def register_4_page(self, model, prefix=None, views=None):
-        prefix = prefix or model.__name__.lower()
-        views = views or ViewsGenerator(model).views
-        if not getattr(views, "pagination_class"):
+        if with_page and not getattr(views, "pagination_class"):
             setattr(views, "pagination_class", MyloePagination)
         self._registry[model] = {
             "prefix": prefix, "views": views
@@ -143,17 +137,15 @@ class CURDManager:
         return self._registry
 
 
-curd_manager = CURDManager()
+def register_router(model_config, with_page=False):
+    router = DefaultRouter()
+    curd_manager = CURDManager()
+    for models, config_data in model_config.items():
+        prefix = config_data.pop("prefix", None)
+        gener = ViewsGenerator(models)
+        gener.config_views(config_data)
+        curd_manager.register(models, prefix, gener.views, with_page)
+    for model, conf in curd_manager.registry.items():
+        router.register(conf['prefix'], conf['views'])
+    return router
 
-for models, config_data in model_config.items():
-    prefix = config_data.pop("prefix", None)
-    gener = ViewsGenerator(models)
-    gener.config_views(config_data)
-    curd_manager.register(models, prefix, gener.views)
-
-curd_manager_page = CURDManager()
-for models, config_data in model_page_config.items():
-    prefix = config_data.pop("prefix", None)
-    gener = ViewsGenerator(models)
-    gener.config_views(config_data)
-    curd_manager_page.register_4_page(models, prefix, gener.views)

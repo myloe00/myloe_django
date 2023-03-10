@@ -3,8 +3,9 @@
 # @Time    : 2023-01-12 19:29
 # @Author  : myloe
 # @File    : table_config.py
-from system.models import SysUser
+from system.models import SysUser, SysRolePermissions
 from rest_framework.pagination import Response, PageNumberPagination
+from .serializers import SysRolePermissionsSerializers
 
 class MyloePagination(PageNumberPagination):
     page_size = 10
@@ -20,7 +21,8 @@ class MyloePagination(PageNumberPagination):
         })
 
 
-model_config = {
+
+base_model_config = {
     # reference_model:{
     #     # "serializer_class": serializers, 指定序列化对象
     #     # "filter_backends": (DjangoFilterBackend, OrderingFilter,),
@@ -29,10 +31,13 @@ model_config = {
     #     # "filter_class": ReferenceFilterClass  #自定义过滤条件，使得查询支持大于小于
     #     # "queryset": SysUser.objects.all()
     # },
-    SysUser: {} # value为空表示，注册该模型所有配置使用默认配置
+    SysUser: {}, # value为空表示，注册该模型所有配置使用默认配置,
+    SysRolePermissions:{
+        "serializer_class": SysRolePermissionsSerializers
+    }
 }
 
-model_page_config = {
+base_model_config_for_page = {
     # reference_model:{
     #     # "serializer_class": serializers, 指定序列化对象
     #     # "filter_backends": (DjangoFilterBackend, OrderingFilter,),
