@@ -34,7 +34,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'system.middleware.LoginMiddleware',
-    'common.middleware.InterceptPagingRequest',
+    'common.easy_curd.middleware.InterceptPagingRequest',
 ]
 
 ROOT_URLCONF = 'myloe_django.urls'

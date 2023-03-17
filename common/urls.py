@@ -1,9 +1,9 @@
 from django.urls import path
 from django.urls.conf import include
 
-from .manager import register_router
-from .model_config import base_model_config, base_model_config_for_page
-from .util import monkey_rest_framework
+from common.easy_curd.manager import register_router
+from common.easy_curd.model_config import base_model_config, base_model_config_for_page
+from common.easy_curd.monkey_rest_framework import monkey_rest_framework
 from django.apps import apps
 
 monkey_rest_framework()

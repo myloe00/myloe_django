@@ -5,7 +5,7 @@
 # @File    : table_config.py
 from system.models import SysUser, SysRolePermissions
 from rest_framework.pagination import Response, PageNumberPagination
-from .serializers import SysRolePermissionsSerializers
+from common.easy_curd.serializers import SysRolePermissionsSerializers
 
 class MyloePagination(PageNumberPagination):
     page_size = 10

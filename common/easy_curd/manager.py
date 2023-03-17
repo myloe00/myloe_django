@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from util.common_util import ImmutableDict
 from rest_framework.filters import OrderingFilter
-from .model_config import MyloePagination
+from common.easy_curd.model_config import MyloePagination
 from functools import partialmethod
 from rest_framework.routers import DefaultRouter
 
