@@ -1,4 +1,6 @@
+import os.path
 from pathlib import Path
+import json
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -137,3 +139,13 @@ LOGGING = {
 #     'DEFAULT_PAGINATION_CLASS': 'my_project.apps.core.pagination.CustomPagination',
 #     'PAGE_SIZE': 100
 # }
+
+RESOURCES_FILE = os.path.join(BASE_DIR, "resources")
+
+# 加载中英文
+LOCALE_FILE = os.path.join(RESOURCES_FILE, 'locale')
+LOCALE = dict()
+for file in os.listdir(LOCALE_FILE):
+    with open(os.path.join(LOCALE_FILE, file)) as f:
+        result = json.load(f)
+        LOCALE[file.rstrip(".json")] = result
