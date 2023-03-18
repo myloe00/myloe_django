@@ -135,17 +135,13 @@ LOGGING = {
     }
 }
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_PAGINATION_CLASS': 'my_project.apps.core.pagination.CustomPagination',
-#     'PAGE_SIZE': 100
-# }
 
 RESOURCES_FILE = os.path.join(BASE_DIR, "resources")
 
-# 加载中英文
+# 加载中英
 LOCALE_FILE = os.path.join(RESOURCES_FILE, 'locale')
 LOCALE = dict()
 for file in os.listdir(LOCALE_FILE):
-    with open(os.path.join(LOCALE_FILE, file)) as f:
+    with open(os.path.join(LOCALE_FILE, file), encoding='utf-8') as f:
         result = json.load(f)
         LOCALE[file.rstrip(".json")] = result

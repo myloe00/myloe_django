@@ -15,6 +15,7 @@ def get_easy_serializers(model, fields="__all__"):
         })
     })()
 
+
 class SysUserSerializers(serializers.ModelSerializer):
     class Meta:
         model = SysUser
@@ -30,7 +31,7 @@ class SysRoleModelSerializer(serializers.ModelSerializer):
 
 class SysRolePermissionsSerializers(serializers.ModelSerializer):
     role = get_easy_serializers(SysRole)
+
     class Meta:
         model = SysRolePermissions
         fields = "__all__"
-

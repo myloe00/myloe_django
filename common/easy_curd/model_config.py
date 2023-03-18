@@ -7,6 +7,7 @@ from system.models import SysUser, SysRolePermissions
 from rest_framework.pagination import Response, PageNumberPagination
 from common.easy_curd.serializers import SysRolePermissionsSerializers
 
+
 class MyloePagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
@@ -47,5 +48,6 @@ base_model_config_for_page = {
     #     # "queryset": SysUser.objects.all()
     #     # "pagination_class": 指定分页器对象
     # },
-    SysUser: {} # value为空表示，注册该模型所有配置使用默认配置
+    # value为空表示，注册该模型所有配置使用默认配置
+    SysUser: {}
 }

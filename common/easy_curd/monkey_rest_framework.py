@@ -13,16 +13,14 @@ from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView
 from django.apps import apps
 app_config = apps.get_app_config("common")
-# from .urls import batch_route
 
 def exception_handler(exc, context):
     """
     Returns the response that should be used for any given exception.
 
-    By default we handle the REST framework `APIException`, and also
+    By default, we handle the REST framework `APIException`, and also
     Django's built-in `Http404` and `PermissionDenied` exceptions.
 
     Any unhandled exceptions may return `None`, which will cause a 500 error
@@ -49,10 +47,12 @@ def exception_handler(exc, context):
         return Response(data, status=exc.status_code, headers=headers)
     return None
 
+
 def destroy(self, request, *args, **kwargs):
     instance = self.get_object()
     self.perform_destroy(instance)
     return Response(status=status.HTTP_200_OK, data={"msg": "delete success"})
+
 
 def dispatch(self, request, *args, **kwargs):
     """

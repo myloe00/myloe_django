@@ -13,7 +13,6 @@ class LoginView(View): #需要继承自View类
     func = ''
 
     def dispatch(self, request, *args, **kwargs):
-        # todo CBV指定方法名称并指定请求类型（GET,POST）
         if hasattr(self, self.func):
             handler = getattr(self, self.func)
         else:

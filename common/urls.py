@@ -9,14 +9,12 @@ from django.apps import apps
 monkey_rest_framework()
 
 
-
 app_config = apps.get_app_config("common")
 base_router = register_router(base_model_config)
 base_router_for_page = register_router(base_model_config_for_page, with_page=True)
 
 
 urlpatterns = [
-    # todo 关联查询
     path(app_config.batch_route, include(base_router.urls)),
     path(app_config.page_route, include(base_router_for_page.urls)),
     path(app_config.base_route, include(base_router.urls)),

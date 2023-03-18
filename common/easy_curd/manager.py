@@ -1,5 +1,4 @@
 import logging
-
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ModelViewSet
@@ -37,7 +36,6 @@ def multi_put(self, request, model, *args, **kwargs):
     # todo 返回新增异常的对象
     """
     partial = kwargs.pop('partial', True)
-    instances = []
     if isinstance(request.data, list):
         for item in request.data:
             instance = get_object_or_404(model, id=int(item['id']))
@@ -85,7 +83,7 @@ class ViewsGenerator:
         self._serializers = type(f"{self.model.__name__}Serializers", (ModelSerializer,), {
             "Meta": type("Meta", (), {
                 "model": self.model,
-                "fields":"__all__"
+                "fields": "__all__"
             })
         })
         self._views = type(f"{self.model.__name__}Serializers", (ModelViewSet, ), {
@@ -99,17 +97,16 @@ class ViewsGenerator:
             "multi_put": partialmethod(multi_put, model=self.model),
             "multi_patch": partialmethod(multi_patch, model=self.model),
         })
-        # self.create_views()
 
     def config_views(self, views_conf: dict):
         for k, v in views_conf.items():
             setattr(self._views, k, v)
 
     def set_serializer(self, serializer):
-        setattr(self._views, "serializer_class", serializer)
+        setattr(self._views, 'serializer_class', serializer)
 
     def set_ordering_fields(self, *args):
-        setattr(self._views, args)
+        setattr(self._views, 'ordering_fields', args)
 
     @property
     def views(self):
@@ -148,4 +145,3 @@ def register_router(model_config, with_page=False):
     for model, conf in curd_manager.registry.items():
         router.register(conf['prefix'], conf['views'])
     return router
-
