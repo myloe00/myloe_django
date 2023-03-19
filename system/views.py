@@ -1,14 +1,10 @@
 import logging
-import time
-
-from django.shortcuts import render
+from django.views import View
 from django.http import HttpResponse
-# Create your views here.
 logger = logging.getLogger("django")
 
-from django.views import View
 
-class LoginView(View): #需要继承自View类
+class LoginView(View):
 
     func = ''
 
@@ -24,7 +20,7 @@ class LoginView(View): #需要继承自View类
         return HttpResponse("登录成功")
 
     def login(self, request):
-        # https: // blog.csdn.net / qq_31339141 / article / details / 103888903
+        # https://blog.csdn.net/qq_31339141/article/details/103888903
         return HttpResponse("登录成功2")
 
 

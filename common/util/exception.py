@@ -4,6 +4,7 @@
 # @Author  : myloe
 # @File    : exception.py
 from myloe_django.settings import LOCALE
+from django.http import JsonResponse
 import logging
 logger = logging.getLogger("util")
 
@@ -18,16 +19,17 @@ def translation(msg, locale='zh') -> str:
 
 class BaseException(Exception):
     CODE = 1000
+    MSG = ''
     dynamic = None
 
-    def __init__(self, msg, code=None, dynamic=None):
+    def __init__(self, msg='', code=None, dynamic=None):
         super().__init__(msg, code)
-        self.msg = msg
+        self.msg = msg or self.MSG
         if isinstance(dynamic, str):
             self.dynamic = [dynamic]
         else:
             self.dynamic = dynamic
-        self.status = code or self.CODE
+        self.code = code or self.CODE
 
     def __str__(self):
         try:
@@ -41,10 +43,21 @@ class BaseException(Exception):
             ret_str = translation(self.msg) + ',' + ','.join([translation(record) for record in self.dynamic])
         return ret_str
 
+    @property
+    def json_response(self):
+        """
+            middleware中无法拦截middleware中出现的错误
+        """
+        return JsonResponse(data={"msg": str(self), "code": self.code}, status=self.code)
+
 
 class UserFriendlyException(BaseException):
     CODE = 1001
 
+
+class AuthenticationFailed(BaseException):
+    CODE = 401
+    MSG = 'Authentication Failed'
 
 
 if __name__ == '__main__':

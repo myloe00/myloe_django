@@ -3,3 +3,4 @@ pymysql==1.0.2
 cryptography==39.0.0
 djangorestframework==3.14.0
 django-filter==22.1
+PyJWT==2.6.0

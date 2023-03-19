@@ -8,5 +8,5 @@ from .views import LoginView
 
 urlpatterns = [
     # todo 功能权限与数据权限该如何隔离？
-    path("test", LoginView.as_view(func='login'))
+    path("login", LoginView.as_view(func='login'))
 ]

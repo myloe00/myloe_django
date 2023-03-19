@@ -5,11 +5,12 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from util.common_util import ImmutableDict
+from common.util.common_util import ImmutableDict
 from rest_framework.filters import OrderingFilter
 from common.easy_curd.model_config import MyloePagination
 from functools import partialmethod
 from rest_framework.routers import DefaultRouter
+from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger("django")
 
@@ -54,18 +55,32 @@ def multi_patch(self, request, model, *args, **kwargs):
 
 
 def multi_post(self, request, *args, **kwargs):
-    headers = None
     if isinstance(request.data, list):
-        res = list()
+        succeed_models = list()
+        failed_models = list()
+        errors = list()
         for item in request.data:
-            serializer = self.get_serializer(data=item)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            res.append(serializer.data)
+            try:
+                serializer = self.get_serializer(data=item)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
+                succeed_models.append(serializer.data)
+            except ValidationError as e1:
+                failed_models.append(item)
+                errors.append(e1.detail)
+            except Exception as e2:
+                raise e2
     else:
         raise Exception
-    return Response(res, status=status.HTTP_201_CREATED, headers=headers)
+    return Response({
+        'succeed': {
+            'models': succeed_models
+        },
+        'failed': {
+            'models': failed_models,
+            'details': errors
+        }
+    }, status=status.HTTP_201_CREATED)
 
 
 class ViewsGenerator:

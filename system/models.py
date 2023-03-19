@@ -6,7 +6,7 @@ from django.db import models
 #   * Rearrange models' order
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
+#   * Remove `managed = True` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
@@ -17,7 +17,7 @@ class SysContentType(models.Model):
     desc = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sys_content_type'
         unique_together = (('app_label', 'module'),)
         ordering = ['id']
@@ -34,7 +34,7 @@ class SysMenu(models.Model):
     menu_route = models.CharField(max_length=255)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sys_menu'
         ordering = ['id']
 
@@ -47,7 +47,7 @@ class SysPermission(models.Model):
     desc = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sys_permission'
         ordering = ['id']
 
@@ -58,7 +58,7 @@ class SysRole(models.Model):
     desc = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sys_role'
         ordering = ['id']
 
@@ -69,7 +69,7 @@ class SysRoleMenu(models.Model):
     menu = models.ForeignKey(SysMenu, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sys_role_menu'
         ordering = ['id']
 
@@ -80,7 +80,7 @@ class SysRolePermissions(models.Model):
     permission = models.ForeignKey(SysPermission, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sys_role_permissions'
         ordering = ['id']
 
@@ -99,7 +99,7 @@ class SysUser(models.Model):
     date_joined = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sys_user'
         ordering = ['id']
 
@@ -110,6 +110,6 @@ class SysUserRoles(models.Model):
     role = models.ForeignKey(SysRole, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sys_user_roles'
         ordering = ['id']
