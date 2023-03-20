@@ -11,6 +11,20 @@ from django.db import models
 from django.db import models
 
 
+class BaseModel(models.Model):
+    id = models.CharField(max_length=128, primary_key=True)
+
+    @property
+    def value(self):
+        ret_data = dict()
+        for field in self._meta.fields:
+            ret_data[field.name] = self.__dict__.get(field.name)
+        return ret_data
+
+    class Meta:
+        abstract = True
+
+
 class SysContentType(models.Model):
     app_label = models.CharField(max_length=100)
     module = models.CharField(max_length=100, blank=True, null=True)
@@ -85,8 +99,7 @@ class SysRolePermissions(models.Model):
         ordering = ['id']
 
 
-class SysUser(models.Model):
-    id = models.CharField(max_length=128, primary_key=True)
+class SysUser(BaseModel):
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
     is_superuser = models.IntegerField()

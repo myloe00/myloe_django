@@ -48,7 +48,7 @@ class BaseException(Exception):
         """
             middleware中无法拦截middleware中出现的错误
         """
-        return JsonResponse(data={"msg": str(self), "code": self.code}, status=self.code)
+        return JsonResponse(data={"msg": str(self), "code": self.code})
 
 
 class UserFriendlyException(BaseException):

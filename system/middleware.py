@@ -3,8 +3,9 @@
 # @Time    : 2023-01-11 18:00
 # @Author  : myloe
 # @File    : middleware.py
-from django.http import JsonResponse
 from common.util.exception import AuthenticationFailed
+from common.util.token import JWTToken
+from myloe_django.settings import DEBUG
 
 
 class AuthenticationMiddleware:
@@ -14,26 +15,21 @@ class AuthenticationMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        new_token = None
         if request.path not in self.WHITE_LIST:
-            res = self.valid_user(request)
-            if res:
-                return res
-        self.update_user(request)
+            if True:
+                token = request.META.get('HTTP_AUTHRIZATION')
+                if not token:
+                    return AuthenticationFailed('token missing!').json_response
+                payloads = JWTToken.decrypt_token(token)
+                user = payloads.get('user', dict())
+                if not self.valid_user(user):
+                    return AuthenticationFailed('The user does not have permissions').json_response
+                new_token = JWTToken.refresh_token_by_payloads(payloads)
         response = self.get_response(request)
+        if new_token:
+            response.headers['Set-Authrization'] = new_token
         return response
 
-    def valid_user(self, request):
-        token = request.META.get('HTTP_AUTHENTICATION', '')
-        if not token:
-            return AuthenticationFailed().json_response
-        # 验证token
-
-    def update_user(self, request):
-        # todo 加载redis中的内容
-        user = request.user
-
-    def process_exception(self, request, exception):
-
-        print(
-            "xxxxxxxxxx222"
-        )
+    def valid_user(self, user):
+        return user
