@@ -25,16 +25,25 @@ class LoginView(View):
         return HttpResponse("登录成功")
 
     def login(self, request):
+        import logging
+        logger = logging.getLogger('root')
+        logger.info("xxxxxxxxx")
+        logger.debug("yyyyyyyyy")
+        logger.error("zzzzzzzzzzzzz")
         login_data = json.loads(request.body)
         user = SysUser.objects.get(username= login_data.get('username'), password=login_data.get('password'))
         if user:
             token = JWTToken.get_token({"user": user.value})
-        # https://blog.csdn.net/qq_31339141/article/details/103888903
+            # https://blog.csdn.net/qq_31339141/article/details/103888903
             response = JsonResponse()
             response.headers['Set-Authrization'] = token
         else:
             response = AuthenticationFailed.json_response
         return response
+
+
+
+
 
 
 
