@@ -26,12 +26,12 @@ class LoginView(View):
 
     def login(self, request):
         import logging
-        logger = logging.getLogger('root')
-        logger.info("xxxxxxxxx")
-        logger.debug("yyyyyyyyy")
-        logger.error("zzzzzzzzzzzzz")
+        logger = logging.getLogger()
+        logger.info("INFO!!!!")
+        logger.debug("DEBUG!!!!")
+        logger.error("ERROR!!!")
         login_data = json.loads(request.body)
-        user = SysUser.objects.get(username= login_data.get('username'), password=login_data.get('password'))
+        user = SysUser.objects.get(username=login_data.get('username'), password=login_data.get('password'))
         if user:
             token = JWTToken.get_token({"user": user.value})
             # https://blog.csdn.net/qq_31339141/article/details/103888903

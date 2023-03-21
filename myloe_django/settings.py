@@ -1,7 +1,10 @@
 import logging
 import os.path
-from pathlib import Path
 import json
+from pathlib import Path
+from .config.db import DATABASES
+from .config.logging import LOGGING
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,7 +25,6 @@ INSTALLED_APPS = [
     'django_filters',
     'system',
     'common',
-    # 'django.contrib.staticfiles',
 ]
 
 
@@ -60,7 +62,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'myloe_django.wsgi.application'
-from .config.db import DATABASES
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -89,7 +90,6 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TOKEN_EXPIRED_TIME = 3600
 # 日志配置
-from .config.logging import LOGGING
 
 RESOURCES_FILE = os.path.join(BASE_DIR, "resources")
 
@@ -101,5 +101,3 @@ for file in os.listdir(LOCALE_FILE):
         result = json.load(f)
         LOCALE[file.rstrip(".json")] = result
 
-from logging import Logger
-logging.getLogger()

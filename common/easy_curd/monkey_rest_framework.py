@@ -16,6 +16,7 @@ from rest_framework.views import APIView
 from django.apps import apps
 app_config = apps.get_app_config("common")
 
+
 def exception_handler(exc, context):
     """
     Returns the response that should be used for any given exception.
