@@ -21,5 +21,7 @@ from django.conf.urls import include
 urlpatterns = [
     path('system/', include("system.urls")),
     path('common/', include("common.urls")),
-    path('admin/', admin.site.urls)
+    path('admin/', admin.site.urls),
+    path('api/swagger/', include('common.swagger.swagger')),
+    path('api/demo_swagger/', include('common.swagger.swagger_demo_urls')),
 ]

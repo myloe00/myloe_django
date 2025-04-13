@@ -1,9 +1,9 @@
-import logging
 import os.path
 import json
 from pathlib import Path
 from .config.db import DATABASES
 from .config.logging import LOGGING
+from common.settings import *
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'rest_framework',
     'django_filters',
+    'drf_spectacular',
     'system',
     'common',
 ]

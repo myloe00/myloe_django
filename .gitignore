@@ -142,3 +142,5 @@ cython_debug/
 myloe_django/settings.py
 .git
 .idea
+.vscode
+.cursor

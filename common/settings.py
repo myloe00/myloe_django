@@ -3,3 +3,4 @@
 # @Time    : 2023-01-16 15:03
 # @Author  : myloe
 # @File    : settings.py
+from .swagger.settings import *

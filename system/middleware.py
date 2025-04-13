@@ -17,7 +17,7 @@ class AuthenticationMiddleware:
     def __call__(self, request):
         new_token = None
         if request.path not in self.WHITE_LIST:
-            if True:
+            if not DEBUG:
                 token = request.META.get('HTTP_AUTHRIZATION')
                 if not token:
                     return AuthenticationFailed('token missing!').json_response
