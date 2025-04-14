@@ -144,3 +144,4 @@ myloe_django/settings.py
 .idea
 .vscode
 .cursor
+logs/*
