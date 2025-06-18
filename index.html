@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>上传页面</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e8edf5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(40,70,130,0.10);
+            padding: 36px 44px 44px 44px;
+        }
+        h1 {
+            text-align: center;
+            color: #204080;
+            margin-bottom: 32px;
+            letter-spacing: 2px;
+        }
+        form {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        label {
+            font-weight: bold;
+            color: #204080;
+        }
+        select, input[type="file"] {
+            padding: 7px 12px;
+            border-radius: 5px;
+            border: 1px solid #7a99c8;
+            background: #f2f5fa;
+            color: #204080;
+        }
+        input[type="submit"] {
+            background: #3566a8;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 9px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(40,70,130,0.13);
+        }
+        input[type="submit"]:hover {
+            background: #204080;
+        }
+        h2 {
+            color: #204080;
+            margin-top: 36px;
+            letter-spacing: 1px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            background: #f4f7fb;
+            border-radius: 7px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(40,70,130,0.08);
+        }
+        th, td {
+            padding: 13px 10px;
+            text-align: center;
+        }
+        th {
+            background: #c7d4ed;
+            color: #204080;
+            font-weight: 600;
+        }
+        tr:nth-child(even) td {
+            background: #e3eaf6;
+        }
+        tr:hover td {
+            background: #c7d4ed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>文件上传</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <label>选择文件类型：</label>
+            <select name="file_type">
+                <option value="TB">TB</option>
+                <option value="GL">GL</option>
+            </select>
+            <input type="file" name="file">
+            <input type="submit" value="上传">
+        </form>
+
+        <h2>表格一</h2>
+        <table>
+            <tr>
+                <th>姓名</th><th>年龄</th><th>城市</th>
+            </tr>
+            {% for row in table1 %}
+            <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.age }}</td>
+                <td>{{ row.city }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>表格二</h2>
+        <table>
+            <tr>
+                <th>姓名</th><th>年龄</th><th>城市</th>
+            </tr>
+            {% for row in table2 %}
+            <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.age }}</td>
+                <td>{{ row.city }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h2>表格三</h2>
+        <table>
+            <tr>
+                <th>姓名</th><th>年龄</th><th>城市</th><th>部门</th><th>薪资</th>
+            </tr>
+            {% for row in table3 %}
+            <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.age }}</td>
+                <td>{{ row.city }}</td>
+                <td>{{ row.department }}</td>
+                <td>{{ row.salary }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html> 
